@@ -8,7 +8,8 @@ import PolicyArea from "./PolicyArea";
 import Button from "@material-ui/core/Button";
 import AddPolicy from "./AddPolicy";
 import EditPolicy from "./EditPolicy";
-// import Alert from "@material-ui/lab/Alert";
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -21,12 +22,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 const PolicyDash = () => {
   const classes = useStyles();
   const [addNewBookClick, setAddNewBookClick] = useState(false);
   const [editBookClick, setEditBookClick] = useState(false);
   const [books, setBooks] = useState([]);
   const [book, setbook] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const getAllBooks = () => {
     axios
@@ -69,7 +77,9 @@ const PolicyDash = () => {
       })
       .then((resp) => {
         console.log(resp.data);
-        alert(resp.data);
+        setSnackbarMessage(resp.data);
+        setSnackbarSeverity("success");
+        setOpenSnackbar(true);
         setAddNewBookClick(!addNewBookClick);
       });
 
@@ -96,7 +106,9 @@ const PolicyDash = () => {
         lob: lob,
       })
       .then((resp) => {
-        alert(resp.data);
+        setSnackbarMessage(resp.data);
+        setSnackbarSeverity("success");
+        setOpenSnackbar(true);
         setEditBookClick(!editBookClick);
       });
   };
@@ -116,6 +128,14 @@ const PolicyDash = () => {
   useEffect(() => {
     getAllBooks();
   }, []);
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSnackbar(false);
+  };
 
   return (
     <>
@@ -152,6 +172,11 @@ const PolicyDash = () => {
           </Grid>
         </Grid>
       </Grid>
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
