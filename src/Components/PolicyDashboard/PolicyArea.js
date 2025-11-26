@@ -12,6 +12,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import numeral from 'numeral';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -104,7 +105,7 @@ const PolicyArea = ({ books, editBook, setBooks }) => {
                 <Typography>
                   Premium:{" "}
                   <span style={{ color: "green", fontWeight: "bold" }}>
-                    ${card.premium === undefined ? "" :  card.premium.toLocaleString()}
+                    ${card.premium === undefined ? "" : numeral(card.premium).format('0,0.00')}
                   </span>
                 </Typography>
               </CardContent>

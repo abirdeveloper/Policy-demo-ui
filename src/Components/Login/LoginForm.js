@@ -1,17 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-import Link from "@material-ui/core/Link";
 import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import * as Icon from "@material-ui/icons";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import HomeImg from "../../Images/HomePic.svg";
-import InputAdornment from '@material-ui/core/InputAdornment'
+import InputAdornment from '@material-ui/core/InputAdornment';
+import axios from 'axios';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     height: "100vh",
@@ -50,6 +50,29 @@ const useStyles = makeStyles((theme) => ({
 
 const LoginForm = () => {
   const classes = useStyles();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await axios.post('/api/login', { // Replace with your backend API endpoint
+        email: email,
+        password: password,
+      });
+
+      // Handle successful login (e.g., store token, redirect)
+      console.log("Login successful:", response.data);
+      // Example: localStorage.setItem('token', response.data.token);
+      // Example: window.location.href = '/dashboard';
+
+    } catch (error) {
+      // Handle login error (e.g., display error message)
+      console.error("Login failed:", error.response ? error.response.data : error.message);
+      // Example: alert('Invalid credentials');
+    }
+  };
 
   return (
     <Grid container component="main">
@@ -65,7 +88,7 @@ const LoginForm = () => {
           <Typography component="h1" variant="h5">
            Sign In
           </Typography>
-          <form className={classes.form} style={{paddingTop:"10px"}}>
+          <form className={classes.form} onSubmit={handleSubmit} style={{paddingTop:"10px"}}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
@@ -75,8 +98,9 @@ const LoginForm = () => {
                   id="email"
                   label="Email Address"
                   name="email"
-                  value="password123"
                   autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -96,6 +120,8 @@ const LoginForm = () => {
                   type="password"
                   id="password"
                   autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">

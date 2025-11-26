@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -34,9 +34,27 @@ const AddPolicy = (props) => {
   const [email, setEmail] = useState("");
   const [lob, setLob] = useState("");
   const [premium, setPremium] = useState("");
+
+  useEffect(() => {
+    // Generate policy number and premium when the component mounts
+    generatePolicyNumber();
+    generatePremium();
+  }, []);
+
+  const generatePolicyNumber = () => {
+    // Logic to generate policy number (you can customize this)
+    const randomNumber = Math.floor(Math.random() * 1000000);
+    setPolicynumber(`POLICY-${randomNumber}`);
+  };
+
+  const generatePremium = () => {
+    // Logic to generate premium (you can customize this)
+    const randomPremium = Math.floor(Math.random() * 10000) + 100; // Ensure premium is at least 100
+    setPremium(randomPremium.toString());
+  };
+
   const handleAddNewBook = (e) => {
     e.preventDefault();
-    debugger;
     props.AddNewBook(customername, address, policynumber, premium, email, lob);
     setCustomername("");
     setAddress("");
@@ -112,6 +130,30 @@ const AddPolicy = (props) => {
                 <MenuItem value={"Umbrella"}>Umbrella</MenuItem>
                 <MenuItem value={"Package Policy"}>Package Policy</MenuItem>
               </Select>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                variant="standard"
+                fullWidth
+                id="PolicyNumber"
+                label="Policy Number"
+                value={policynumber}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                variant="standard"
+                fullWidth
+                id="Premium"
+                label="Premium"
+                value={premium}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
             </Grid>
           </Grid>
 
