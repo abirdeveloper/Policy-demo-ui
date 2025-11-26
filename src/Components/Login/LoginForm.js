@@ -75,6 +75,7 @@ const LoginForm = () => {
                   id="email"
                   label="Email Address"
                   name="email"
+                  value="password123"
                   autoComplete="email"
                   InputProps={{
                     startAdornment: (
