@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const PolicyArea = ({ books, editBook }) => {
+const PolicyArea = ({ books, editBook, setBooks }) => {
   const classes = useStyles();
 
   const handleDeleteBook = (code) => {
@@ -54,6 +54,7 @@ const PolicyArea = ({ books, editBook }) => {
       })
       .then((resp) => {
         console.log(resp.data);
+        setBooks(books.filter((book) => book._id !== code));
       });
   };
 
