@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
@@ -7,6 +7,11 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -43,6 +48,23 @@ const useStyles = makeStyles((theme) => ({
 
 const PolicyArea = ({ books, editBook, setBooks }) => {
   const classes = useStyles();
+  const [open, setOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+
+  const handleClickOpen = (id) => {
+    setDeleteId(id);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleConfirmDelete = () => {
+    handleDeleteBook(deleteId);
+    setOpen(false);
+  };
+
 
   const handleDeleteBook = (code) => {
     console.log(code);
@@ -99,11 +121,7 @@ const PolicyArea = ({ books, editBook, setBooks }) => {
                   size="small"
                   color="primary"
                   variant="outlined"
-                  onClick={() => {
-                    if (window.confirm("Are you sure to delete this record?")) {
-                      handleDeleteBook(card._id);
-                    }
-                  }}
+                  onClick={() => handleClickOpen(card._id)}
                 >
                   Delete
                 </Button>
@@ -112,6 +130,27 @@ const PolicyArea = ({ books, editBook, setBooks }) => {
           </Grid>
         ))}
       </Grid>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm Delete?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this record?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
