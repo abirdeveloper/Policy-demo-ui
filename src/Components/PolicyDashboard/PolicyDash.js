@@ -29,9 +29,22 @@ const PolicyDash = () => {
   const [book, setbook] = useState([]);
   const [error, setError] = useState(null);
 
+  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
+
+  useEffect(() => {
+    if (!apiEndpoint) {
+      console.error("REACT_APP_API_ENDPOINT is not configured.");
+      setError(
+        "API endpoint is not configured. Please check your environment variables."
+      );
+    }
+  }, [apiEndpoint]);
+
   const getAllBooks = () => {
+    if (!apiEndpoint) return;
+
     axios
-      .get(process.env.REACT_APP_API_ENDPOINT + "/Policies")
+      .get(`${apiEndpoint}/Policies`)
       .then((resp) => setBooks(resp.data))
       .catch((error) => {
         console.error("Error fetching policies:", error);
@@ -51,6 +64,8 @@ const PolicyDash = () => {
     email,
     lob
   ) => {
+    if (!apiEndpoint) return;
+
     let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let randomAlpha = "";
     let length = 1; // Customize the length here.
@@ -64,7 +79,7 @@ const PolicyDash = () => {
       randompolicynumber.slice(4, 8);
     premium = Math.floor(Math.random() * 10000);
     axios
-      .post(process.env.REACT_APP_API_ENDPOINT + "/addpolicy", {
+      .post(`${apiEndpoint}/addpolicy`, {
         customername: customername,
         address: address,
         policynumber: policynumber,
@@ -94,8 +109,10 @@ const PolicyDash = () => {
     email,
     lob
   ) => {
+    if (!apiEndpoint) return;
+
     axios
-      .put(process.env.REACT_APP_API_ENDPOINT + "/updatepolicy/", {
+      .put(`${apiEndpoint}/updatepolicy/`, {
         _id: id,
         customername: customername,
         address: address,
@@ -114,10 +131,10 @@ const PolicyDash = () => {
       });
   };
   const fetchPolicy = async (_id) => {
+    if (!apiEndpoint) return null;
+
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_ENDPOINT}/policy/${_id}`
-      );
+      const res = await fetch(`${apiEndpoint}/policy/${_id}`);
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
@@ -140,7 +157,7 @@ const PolicyDash = () => {
 
   useEffect(() => {
     getAllBooks();
-  }, [books]);
+  }, [books, apiEndpoint]);
 
   return (
     <>

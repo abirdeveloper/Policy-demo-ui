@@ -76,8 +76,14 @@ const LoginForm = () => {
     const sanitizedPassword = DOMPurify.sanitize(values.password);
 
     try {
+      // Ensure REACT_APP_API_ENDPOINT is configured
+      const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
+      if (!apiEndpoint) {
+        throw new Error("REACT_APP_API_ENDPOINT is not configured in this environment.");
+      }
+
       // Simulate API call (replace with your actual API endpoint)
-      const response = await fetch(process.env.REACT_APP_API_ENDPOINT || '/api/login', {
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

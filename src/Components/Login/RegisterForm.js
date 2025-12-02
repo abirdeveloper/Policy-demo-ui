@@ -98,13 +98,22 @@ const RegisterForm = () => {
         firstName: DOMPurify.sanitize(values.firstName),
         lastName: DOMPurify.sanitize(values.lastName),
         email: DOMPurify.sanitize(values.email),
-        password: DOMPurify.sanitize(values.password),
+        password: DOMPurify.sanitize(values.password), // Consider hashing on the client-side as well
         contact: DOMPurify.sanitize(values.contact),
         address: DOMPurify.sanitize(values.address),
       };
 
+      const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
+
+      if (!apiEndpoint) {
+        console.error("REACT_APP_API_ENDPOINT is not defined in the environment.");
+        setSubmissionError("Registration failed: API endpoint not configured.");
+        setSubmitting(false);
+        return;
+      }
+
       // Simulate API call (replace with your actual API endpoint)
-      const response = await fetch(process.env.REACT_APP_API_ENDPOINT || "/api/register", {
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

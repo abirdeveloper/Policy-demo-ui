@@ -64,7 +64,22 @@ const PolicyArea = ({ books, editBook }) => {
 
 
   const handleDeleteBook = (code) => {
-    console.log(code);
+    if (!process.env.REACT_APP_API_ENDPOINT_DELETE_POLICY) {
+      console.error("REACT_APP_API_ENDPOINT_DELETE_POLICY is not configured.");
+      setAlertMessage("API endpoint for deleting policy is not configured.");
+      setAlertSeverity("error");
+      setOpen(true);
+      return;
+    }
+
+    if (!code) {
+      console.error("Invalid policy ID:", code);
+      setAlertMessage("Invalid policy ID. Please try again.");
+      setAlertSeverity("error");
+      setOpen(true);
+      return;
+    }
+
     axios
       .delete(process.env.REACT_APP_API_ENDPOINT_DELETE_POLICY, {
         data: {
