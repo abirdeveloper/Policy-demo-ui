@@ -54,6 +54,10 @@ const PolicyArea = ({ books, editBook }) => {
       })
       .then((resp) => {
         console.log(resp.data);
+      })
+      .catch((error) => {
+        console.error("Error deleting book:", error);
+        // Optionally, display an error message to the user
       });
   };
 
