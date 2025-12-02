@@ -77,7 +77,7 @@ const LoginForm = () => {
 
     try {
       // Simulate API call (replace with your actual API endpoint)
-      const response = await fetch('/api/login', {
+      const response = await fetch(process.env.REACT_APP_API_ENDPOINT || '/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

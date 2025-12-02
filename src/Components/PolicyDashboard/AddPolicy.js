@@ -9,6 +9,27 @@ import * as Icon from "@material-ui/icons";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import Alert from "@material-ui/lab/Alert";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  customername: yup.string().required("Customer Name is required"),
+  address: yup.string().required("Address is required"),
+  policynumber: yup
+    .string()
+    .required("Policy Number is required")
+    .matches(/^[a-zA-Z0-9]+$/, "Policy Number must be alphanumeric"),
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  lob: yup.string().required("LOB is required"),
+  premium: yup
+    .number()
+    .required("Premium is required")
+    .positive("Premium must be a positive number"),
+});
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -30,29 +51,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const AddPolicy = (props) => {
-  const [customername, setCustomername] = useState("");
-  const [address, setAddress] = useState("");
-  const [policynumber, setPolicynumber] = useState("");
-  const [email, setEmail] = useState("");
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: yupResolver(schema),
+  });
   const [lob, setLob] = useState("");
-  const [premium, setPremium] = useState("");
   const [error, setError] = useState("");
 
-  const handleAddNewBook = async (e) => {
-    e.preventDefault();
+  const handleAddNewBook = async (data) => {
     try {
       await props.AddNewBook(
-        customername,
-        address,
-        policynumber,
-        premium,
-        email,
+        data.customername,
+        data.address,
+        data.policynumber,
+        data.premium,
+        data.email,
         lob
       );
-      setCustomername("");
-      setAddress("");
-      setPolicynumber("");
-      setPremium("");
       setError(""); // Clear any previous errors
     } catch (err) {
       setError(
@@ -73,41 +87,59 @@ const AddPolicy = (props) => {
           Add New Policy
         </Typography>
         {error && <Alert severity="error">{error}</Alert>}
-        <form onSubmit={handleAddNewBook}>
+        <form onSubmit={handleSubmit(handleAddNewBook)}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                name="outlined"
                 variant="standard"
                 label="Customer Name"
-                required
                 fullWidth
                 autoFocus
-                onChange={(e) => setCustomername(e.target.value)}
+                {...register("customername")}
+                error={!!errors.customername}
+                helperText={errors.customername?.message}
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
                 variant="standard"
-                required
                 fullWidth
-                id="Author"
                 label="Address"
-                onChange={(e) => setAddress(e.target.value)}
+                {...register("address")}
+                error={!!errors.address}
+                helperText={errors.address?.message}
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
                 variant="standard"
-                required
                 fullWidth
-                id="Email"
+                label="Policy Number"
+                {...register("policynumber")}
+                error={!!errors.policynumber}
+                helperText={errors.policynumber?.message}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                variant="standard"
+                fullWidth
+                label="Premium"
+                type="number"
+                {...register("premium", { valueAsNumber: true })}
+                error={!!errors.premium}
+                helperText={errors.premium?.message}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                variant="standard"
+                fullWidth
                 label="Email"
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
                 type="email"
-                maxLength="10"
+                {...register("email")}
+                error={!!errors.email}
+                helperText={errors.email?.message}
               />
             </Grid>
             <Grid item xs={12} style={{ paddingBottom: "20px" }}>
@@ -138,7 +170,6 @@ const AddPolicy = (props) => {
             fullWidth
             variant="contained"
             color="primary"
-            type="Submit"
           >
             Add Policy
           </Button>

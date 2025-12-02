@@ -66,7 +66,7 @@ const PolicyArea = ({ books, editBook }) => {
   const handleDeleteBook = (code) => {
     console.log(code);
     axios
-      .delete("http://localhost:5005/deletepolicy", {
+      .delete(process.env.REACT_APP_API_ENDPOINT_DELETE_POLICY, {
         data: {
           _id: code,
         },

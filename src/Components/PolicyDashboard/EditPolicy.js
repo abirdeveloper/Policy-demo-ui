@@ -5,10 +5,25 @@ import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import axios from "axios";
 import * as Icon from "@material-ui/icons";
 import { Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  customername: yup.string().required("Customer Name is required"),
+  address: yup.string().required("Address is required"),
+  emailid: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  premium: yup
+    .number()
+    .required("Premium is required")
+    .positive("Premium must be a positive number"),
+});
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -34,33 +49,39 @@ function Alert(props) {
 }
 
 const EditPolicy = ({ book, editPolicy, editBook }) => {
-  const [customername, setCustomername] = useState(book.customername);
-  const [address, setAddress] = useState(book.address);
-  const [policynumber, setPolicynumber] = useState(book.policynumber);
-  const [email, setEmail] = useState(book.emailid);
-  const [premium, setPremium] = useState(book.premium);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  // Initialize form values using setValue
+  React.useEffect(() => {
+    setValue("customername", book.customername);
+    setValue("address", book.address);
+    setValue("emailid", book.emailid);
+    setValue("premium", book.premium);
+  }, [book, setValue]);
+
   const [lob, setLob] = useState(book.lob);
   const [id, setid] = useState(book._id);
   const [open, setOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleEditBook = async (e) => {
-    e.preventDefault();
+  const handleEditBook = async (data) => {
     try {
       await editPolicy(
         id,
-        customername,
-        address,
-        policynumber,
-        premium,
-        email,
+        data.customername,
+        data.address,
+        book.policynumber,
+        data.premium,
+        data.emailid,
         lob
       );
-      setCustomername("");
-      setAddress("");
-      setPolicynumber("");
-      setPremium("");
-      setid("");
     } catch (error) {
       console.error("Error updating policy:", error);
       setErrorMessage(
@@ -90,54 +111,52 @@ const EditPolicy = ({ book, editPolicy, editBook }) => {
           Edit Policy
         </Typography>
         <hr />
-        <form onSubmit={handleEditBook}>
+        <form onSubmit={handleSubmit(handleEditBook)}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <label htmlFor="bookname">Customer Name:</label>
+              <label htmlFor="customername">Customer Name:</label>
               <TextField
-                defaultValue={book.customername}
                 variant="outlined"
-                id="bookname"
-                required
+                id="customername"
                 fullWidth
                 autoFocus
-                onChange={(e) => setCustomername(e.target.value)}
+                {...register("customername")}
+                error={!!errors.customername}
+                helperText={errors.customername?.message}
               />
             </Grid>
             <Grid item xs={12}>
-              <label htmlFor="Author">Address:</label>
+              <label htmlFor="address">Address:</label>
               <TextField
                 variant="outlined"
-                required
                 fullWidth
-                id="Author"
-                onChange={(e) => setAddress(e.target.value)}
-                defaultValue={book.address}
+                id="address"
+                {...register("address")}
+                error={!!errors.address}
+                helperText={errors.address?.message}
               />
             </Grid>
             <Grid item xs={12}>
-              <label htmlFor="email">Email ID:</label>
+              <label htmlFor="emailid">Email ID:</label>
               <TextField
                 variant="outlined"
-                required
                 fullWidth
-                id="email"
+                id="emailid"
                 style={{ paddingBottom: "10px" }}
-                onChange={(e) => setEmail(e.target.value)}
                 type="email"
-                defaultValue={book.emailid}
+                {...register("emailid")}
+                error={!!errors.emailid}
+                helperText={errors.emailid?.message}
               />
             </Grid>
             <Grid item xs={12}>
               <label htmlFor="Lob">LOB:</label>
               <TextField
                 variant="outlined"
-                required
                 fullWidth
                 id="lob"
                 disabled={true}
                 style={{ paddingBottom: "10px" }}
-                onChange={(e) => setLob(e.target.value)}
                 type="text"
                 defaultValue={book.lob}
               />
@@ -146,7 +165,6 @@ const EditPolicy = ({ book, editPolicy, editBook }) => {
               <label htmlFor="policynbr">Policy Number:</label>
               <TextField
                 variant="outlined"
-                required
                 fullWidth
                 id="policynbr"
                 disabled={true}
@@ -164,15 +182,13 @@ const EditPolicy = ({ book, editPolicy, editBook }) => {
               <label htmlFor="premium">Premium:</label>
               <TextField
                 variant="outlined"
-                required
                 fullWidth
                 id="premium"
                 style={{ paddingBottom: "10px" }}
-                onChange={(e) => {
-                  setPremium(e.target.value);
-                }}
                 type="number"
-                defaultValue={book.premium}
+                {...register("premium")}
+                error={!!errors.premium}
+                helperText={errors.premium?.message}
               />
             </Grid>
           </Grid>

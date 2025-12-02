@@ -31,7 +31,7 @@ const PolicyDash = () => {
 
   const getAllBooks = () => {
     axios
-      .get("http://localhost:5005/Policies")
+      .get(process.env.REACT_APP_API_ENDPOINT + "/Policies")
       .then((resp) => setBooks(resp.data))
       .catch((error) => {
         console.error("Error fetching policies:", error);
@@ -64,7 +64,7 @@ const PolicyDash = () => {
       randompolicynumber.slice(4, 8);
     premium = Math.floor(Math.random() * 10000);
     axios
-      .post("http://localhost:5005/addpolicy", {
+      .post(process.env.REACT_APP_API_ENDPOINT + "/addpolicy", {
         customername: customername,
         address: address,
         policynumber: policynumber,
@@ -95,7 +95,7 @@ const PolicyDash = () => {
     lob
   ) => {
     axios
-      .put("http://localhost:5005/updatepolicy/", {
+      .put(process.env.REACT_APP_API_ENDPOINT + "/updatepolicy/", {
         _id: id,
         customername: customername,
         address: address,
@@ -115,7 +115,9 @@ const PolicyDash = () => {
   };
   const fetchPolicy = async (_id) => {
     try {
-      const res = await fetch(`http://localhost:5005/policy/${_id}`);
+      const res = await fetch(
+        `${process.env.REACT_APP_API_ENDPOINT}/policy/${_id}`
+      );
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
