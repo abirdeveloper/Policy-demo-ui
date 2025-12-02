@@ -7,6 +7,8 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
+import { Snackbar } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -41,8 +43,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+
 const PolicyArea = ({ books, editBook }) => {
   const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState("");
+  const [alertSeverity, setAlertSeverity] = React.useState("success");
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
 
   const handleDeleteBook = (code) => {
     console.log(code);
@@ -54,11 +73,25 @@ const PolicyArea = ({ books, editBook }) => {
       })
       .then((resp) => {
         console.log(resp.data);
+        setAlertMessage("Policy deleted successfully!");
+        setAlertSeverity("success");
+        setOpen(true);
+      })
+      .catch((error) => {
+        console.error("Error deleting policy:", error);
+        setAlertMessage("Failed to delete policy. Please try again.");
+        setAlertSeverity("error");
+        setOpen(true);
       });
   };
 
   return (
     <>
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+        <Alert onClose={handleClose} severity={alertSeverity}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
       <Grid container spacing={2} style={{ paddingTop: "10px" }}>
         {books.map((card) => (
           <Grid item key={card._id} xs={12} sm={6} md={4}>

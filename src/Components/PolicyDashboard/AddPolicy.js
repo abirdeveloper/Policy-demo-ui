@@ -8,6 +8,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import * as Icon from "@material-ui/icons";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
+import Alert from "@material-ui/lab/Alert";
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     margin: theme.spacing(1, 8),
@@ -34,14 +36,29 @@ const AddPolicy = (props) => {
   const [email, setEmail] = useState("");
   const [lob, setLob] = useState("");
   const [premium, setPremium] = useState("");
-  const handleAddNewBook = (e) => {
+  const [error, setError] = useState("");
+
+  const handleAddNewBook = async (e) => {
     e.preventDefault();
-    debugger;
-    props.AddNewBook(customername, address, policynumber, premium, email, lob);
-    setCustomername("");
-    setAddress("");
-    setPolicynumber("");
-    setPremium("");
+    try {
+      await props.AddNewBook(
+        customername,
+        address,
+        policynumber,
+        premium,
+        email,
+        lob
+      );
+      setCustomername("");
+      setAddress("");
+      setPolicynumber("");
+      setPremium("");
+      setError(""); // Clear any previous errors
+    } catch (err) {
+      setError(
+        err.message || "An error occurred while adding the policy."
+      );
+    }
   };
 
   const classes = useStyles();
@@ -55,6 +72,7 @@ const AddPolicy = (props) => {
         <Typography component="h1" variant="h5">
           Add New Policy
         </Typography>
+        {error && <Alert severity="error">{error}</Alert>}
         <form onSubmit={handleAddNewBook}>
           <Grid container spacing={2}>
             <Grid item xs={12}>

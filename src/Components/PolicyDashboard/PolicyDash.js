@@ -8,7 +8,7 @@ import PolicyArea from "./PolicyArea";
 import Button from "@material-ui/core/Button";
 import AddPolicy from "./AddPolicy";
 import EditPolicy from "./EditPolicy";
-// import Alert from "@material-ui/lab/Alert";
+import Alert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,11 +27,16 @@ const PolicyDash = () => {
   const [editBookClick, setEditBookClick] = useState(false);
   const [books, setBooks] = useState([]);
   const [book, setbook] = useState([]);
+  const [error, setError] = useState(null);
 
   const getAllBooks = () => {
     axios
       .get("http://localhost:5005/Policies")
-      .then((resp) => setBooks(resp.data));
+      .then((resp) => setBooks(resp.data))
+      .catch((error) => {
+        console.error("Error fetching policies:", error);
+        setError("Failed to load policies. Please try again later.");
+      });
   };
 
   const handleAddBookClick = () => {
@@ -71,6 +76,10 @@ const PolicyDash = () => {
         console.log(resp.data);
         alert(resp.data);
         setAddNewBookClick(!addNewBookClick);
+      })
+      .catch((error) => {
+        console.error("Error adding policy:", error);
+        setError("Failed to add policy. Please check your input and try again.");
       });
 
     getAllBooks();
@@ -98,19 +107,33 @@ const PolicyDash = () => {
       .then((resp) => {
         alert(resp.data);
         setEditBookClick(!editBookClick);
+      })
+      .catch((error) => {
+        console.error("Error updating policy:", error);
+        setError("Failed to update policy. Please try again.");
       });
   };
   const fetchPolicy = async (_id) => {
-    const res = await fetch(`http://localhost:5005/policy/${_id}`);
-    const data = await res.json();
-    return data;
+    try {
+      const res = await fetch(`http://localhost:5005/policy/${_id}`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching policy:", error);
+      setError("Failed to fetch policy details. Please try again.");
+      return null;
+    }
   };
   const editBook = async (code) => {
     const data = await fetchPolicy(code);
-    setbook(data);
-    setEditBookClick(!editBookClick);
-
-    console.log(data);
+    if (data) {
+      setbook(data);
+      setEditBookClick(!editBookClick);
+      console.log(data);
+    }
   };
 
   useEffect(() => {
@@ -121,6 +144,11 @@ const PolicyDash = () => {
     <>
       <CssBaseline />
       <Grid item xs={10}>
+        {error && (
+          <Alert severity="error" onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
         <div style={{ paddingTop: "20px" }}>
           <Button
             size="small"

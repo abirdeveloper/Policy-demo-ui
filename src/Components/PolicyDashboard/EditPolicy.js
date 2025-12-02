@@ -7,6 +7,9 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import * as Icon from "@material-ui/icons";
+import { Snackbar } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     margin: theme.spacing(1, 8),
@@ -26,6 +29,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 const EditPolicy = ({ book, editPolicy, editBook }) => {
   const [customername, setCustomername] = useState(book.customername);
   const [address, setAddress] = useState(book.address);
@@ -34,14 +41,41 @@ const EditPolicy = ({ book, editPolicy, editBook }) => {
   const [premium, setPremium] = useState(book.premium);
   const [lob, setLob] = useState(book.lob);
   const [id, setid] = useState(book._id);
-  const handleEditBook = (e) => {
+  const [open, setOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleEditBook = async (e) => {
     e.preventDefault();
-    editPolicy(id, customername, address, policynumber, premium, email, lob);
-    setCustomername("");
-    setAddress("");
-    setPolicynumber("");
-    setPremium("");
-    setid("");
+    try {
+      await editPolicy(
+        id,
+        customername,
+        address,
+        policynumber,
+        premium,
+        email,
+        lob
+      );
+      setCustomername("");
+      setAddress("");
+      setPolicynumber("");
+      setPremium("");
+      setid("");
+    } catch (error) {
+      console.error("Error updating policy:", error);
+      setErrorMessage(
+        error.response?.data?.message || "Failed to update policy."
+      );
+      setOpen(true);
+    }
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
   };
 
   const classes = useStyles();
@@ -153,6 +187,11 @@ const EditPolicy = ({ book, editPolicy, editBook }) => {
             Save
           </Button>
         </form>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="error">
+            {errorMessage}
+          </Alert>
+        </Snackbar>
       </div>
     </>
   );
